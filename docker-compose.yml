@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  rl-engine:
+    build: ./rl-engine
+    container_name: smartci_rl
+    ports:
+      - "8000:8000"
+    env_file: ./rl-engine/.env
+    volumes:
+      - rl_models:/app/models
+      - rl_logs:/app/logs
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: smartci_backend
+    ports:
+      - "4000:4000"
+    env_file: ./backend/.env
+    depends_on:
+      - rl-engine
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: smartci_frontend
+    ports:
+      - "3000:3000"
+    env_file: ./frontend/.env.local
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  rl_models:
+  rl_logs:
